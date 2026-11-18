@@ -1,5 +1,3 @@
-
-
 import { useState } from "react";
 import {
   Bell,
@@ -9,22 +7,29 @@ import {
   CloudSun,
   Wifi,
   Activity,
-  Settings
+  UserRound,
+  ShieldCheck,
+  LogOut
 } from "lucide-react";
 
+import Profile from "./components/Profile";
+import DeviceConfiguration from "./components/DeviceConfiguration";
 import Sidebar from "./components/Sidebar";
 import LightCard from "./components/LightCard";
 import WeatherCard from "./components/WeatherCard";
 import ActivityPage from "./components/Activity";
-import SettingsPage from "./components/Settings";
+import Devices from "./components/Devices";
 
 import "./App.css";
 
 function App() {
   const [activePage, setActivePage] = useState("Dashboard");
+  const [selectedDevice, setSelectedDevice] = useState(null);
+  const [deviceName, setDeviceName] = useState("Smart Tube Light");
   const [isLightOn, setIsLightOn] = useState(false);
   const [activities, setActivities] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const [weather, setWeather] = useState({
     city: "Siliguri",
@@ -145,32 +150,26 @@ function App() {
           </>
         );
 
-      case "Lighting":
-        return (
+      case "Devices":
+        return selectedDevice ? (
           <section className="page-section">
-            <h2>Lighting Control</h2>
-            <p>Manage your smart tube light.</p>
-            <div className="single-card">
-              <LightCard
-                isOn={isLightOn}
-                onToggle={toggleLight}
-              />
-            </div>
+            <DeviceConfiguration
+              device={{
+                id: selectedDevice,
+                name: deviceName
+              }}
+              isLightOn={isLightOn}
+              onBack={() => setSelectedDevice(null)}
+              onRename={(updatedName) => setDeviceName(updatedName)}
+            />
           </section>
-        );
-
-      case "Weather":
-        return (
+        ) : (
           <section className="page-section">
-            <h2>Weather Monitoring</h2>
-            <p>Monitor your local weather conditions.</p>
-            <div className="single-card">
-              <WeatherCard
-                weather={weather}
-                onRefresh={refreshWeather}
-                isRefreshing={isRefreshing}
-              />
-            </div>
+            <Devices
+              isLightOn={isLightOn}
+              deviceName={deviceName}
+              onOpenDevice={(deviceId) => setSelectedDevice(deviceId)}
+            />
           </section>
         );
 
@@ -184,10 +183,10 @@ function App() {
           </section>
         );
 
-      case "Settings":
+      case "My Profile":
         return (
           <section className="page-section">
-            <SettingsPage />
+            <Profile />
           </section>
         );
 
@@ -204,9 +203,12 @@ function App() {
       />
 
       <main className="main-content">
+
         <header className="topbar">
           <div>
-            <p className="breadcrumb">SMART HOME / {activePage.toUpperCase()}</p>
+            <p className="breadcrumb">
+              SMART HOME / {activePage.toUpperCase()}
+            </p>
             <h1>{activePage}</h1>
           </div>
 
@@ -214,12 +216,66 @@ function App() {
             <button className="icon-button" aria-label="Search">
               <Search />
             </button>
+
             <button className="icon-button" aria-label="Notifications">
               <Bell />
             </button>
-            <div className="profile-avatar">S</div>
+
+            <div className="profile-menu-container">
+              <button
+                className="profile-avatar"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                aria-label="Open profile menu"
+                aria-expanded={isProfileOpen}
+              >
+                S
+              </button>
+
+              {isProfileOpen && (
+                <div className="profile-dropdown">
+                  <div className="profile-dropdown-header">
+                    <div className="profile-avatar">S</div>
+                    <div>
+                      <h3>My Account</h3>
+                      <p>Account and preferences</p>
+                    </div>
+                  </div>
+
+                  <div className="profile-dropdown-divider"></div>
+
+                  <button
+                    className="profile-dropdown-item"
+                    onClick={() => {
+                      setActivePage("My Profile");
+                      setIsProfileOpen(false);
+                    }}
+                  >
+                    <UserRound size={18} />
+                    <span>My Profile</span>
+                  </button>
+
+                  <div className="profile-dropdown-item">
+                    <Bell size={18} />
+                    <span>Notifications</span>
+                  </div>
+
+                  <div className="profile-dropdown-item">
+                    <ShieldCheck size={18} />
+                    <span>Security & Privacy</span>
+                  </div>
+
+                  <div className="profile-dropdown-divider"></div>
+
+                  <div className="profile-dropdown-item logout-item">
+                    <LogOut size={18} />
+                    <span>Sign Out</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
+
 
         {renderPage()}
       </main>

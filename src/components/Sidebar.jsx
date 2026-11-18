@@ -2,19 +2,15 @@
 
 import {
   LayoutDashboard,
-  Lightbulb,
-  CloudSun,
-  Settings,
+  Cpu,
   Activity,
   House
 } from "lucide-react";
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard },
-  { name: "Lighting", icon: Lightbulb },
-  { name: "Weather", icon: CloudSun },
-  { name: "Activity", icon: Activity },
-  { name: "Settings", icon: Settings },
+  { name: "Devices", icon: Cpu },
+  { name: "Activity", icon: Activity }
 ];
 
 export default function Sidebar({ activePage, setActivePage }) {
