@@ -15,12 +15,15 @@ import {
 import Sidebar from "./components/Sidebar";
 import LightCard from "./components/LightCard";
 import WeatherCard from "./components/WeatherCard";
+import ActivityPage from "./components/Activity";
+import SettingsPage from "./components/Settings";
 
 import "./App.css";
 
 function App() {
   const [activePage, setActivePage] = useState("Dashboard");
   const [isLightOn, setIsLightOn] = useState(false);
+  const [activities, setActivities] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [weather, setWeather] = useState({
@@ -46,7 +49,30 @@ function App() {
   }
 
   function toggleLight() {
-    setIsLightOn(previous => !previous);
+    const newState = !isLightOn;
+
+    setIsLightOn(newState);
+
+    const newActivity = {
+      id: Date.now(),
+      status: newState ? "ON" : "OFF",
+      time: new Date().toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      })
+    };
+
+    setActivities(previous => [newActivity, ...previous]);
+  }
+
+  function clearActivities() {
+    const confirmed = window.confirm(
+      "Are you sure you want to clear all activity history?"
+    );
+
+    if (confirmed) {
+      setActivities([]);
+    }
   }
 
   function renderPage() {
@@ -151,26 +177,17 @@ function App() {
       case "Activity":
         return (
           <section className="page-section">
-            <h2>Activity Log</h2>
-            <p>Device events will appear here after backend integration.</p>
-            <div className="empty-state">
-              <Activity size={40} />
-              <h3>No activity recorded</h3>
-              <p>Activity history is not connected yet.</p>
-            </div>
+            <ActivityPage
+              activities={activities}
+              onClear={clearActivities}
+            />
           </section>
         );
 
       case "Settings":
         return (
           <section className="page-section">
-            <h2>Settings</h2>
-            <p>Manage your device configuration.</p>
-            <div className="empty-state">
-              <Settings size={40} />
-              <h3>Device configuration</h3>
-              <p>Wi-Fi and weather settings will be added later.</p>
-            </div>
+            <SettingsPage />
           </section>
         );
 
